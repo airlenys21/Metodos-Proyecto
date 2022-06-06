@@ -59,7 +59,7 @@ class StartPage(tk.Frame):
         Info.place(x=100, y=260)
         
         
-        Info=tk.Label (self, text="Digite la función (con variable x): Multipicación (*) - Potencia (**) x**3-x*2+1 por ejemplo", fg="#002060", bg="#DFEFF0") 
+        Info=tk.Label (self, text="Digite la función (con variable x): Multipicación (*) - Potencia (**) Por ejemplo: x**3-x*2+1 ", fg="#002060", bg="#DFEFF0") 
         Info.config(font=("Segoe UI Black",13))
         Info.place(x=30, y=300)
 
@@ -72,10 +72,10 @@ class StartPage(tk.Frame):
         Info.place(x=240, y=600)
         
         ##Botones 
-        MCerrado=tk.Button(self, text="Método Cerrado", foreground="#002060" , background="#D5F4FF", width=40, height=8 ,command = lambda : controller.show_frame(Page1)) 
+        MCerrado=tk.Button(self, text="Método Cerrado: Bisección", foreground="#002060" , background="#D5F4FF", width=40, height=8 ,command = lambda : controller.show_frame(Page1)) 
         MCerrado.place(x=100, y=360)
         
-        MAbierto=tk.Button(self, text="Método Abierto ", foreground="#002060" , background="#D5F4FF", width=40 , height=8 , command = lambda : controller.show_frame(Page2))
+        MAbierto=tk.Button(self, text="Método Abierto: Raphson", foreground="#002060" , background="#D5F4FF", width=40 , height=8 , command = lambda : controller.show_frame(Page2))
         MAbierto.place(x=500, y=360)
 
         Cerrar=tk.Button(self, text="Cerrar", width=10, command= self.cerrar)
@@ -157,7 +157,7 @@ class Page1(tk.Frame):
         #Salida
         Salidainfo=tk.Label (self, text="La raíz de la función es:", fg="#20664A", bg="#DFEFF0") 
         Salidainfo.config(font=("Segoe UI Black",15))
-        Salidainfo.place(x=55, y=450)
+        Salidainfo.place(x=30, y=450)
     
         self.Pantalla2 = tk.Label(self, textvariable= self.MAraiz) 
         self.Pantalla2.config(foreground="white", background="black", width=35, height=3)
@@ -275,6 +275,9 @@ class Page2(tk.Frame):
         Resetear=tk.Button(self, text="Resetear", width=10 , command=self.reset)
         Resetear.place(x=425, y=595)
         
+        Graficar=tk.Button(self, text="Graficar", width=10 , command=self.calcular)
+        Graficar.place(x=700, y=150)
+        
         regresar=tk.Button(self, text="Regresar", width=15, command = lambda : [controller.show_frame(StartPage), self.reset()])
         regresar.place(x=625, y=595)
 
@@ -288,9 +291,10 @@ class Page2(tk.Frame):
 
         Salidainfo=tk.Label (self, text="La raíz de la función es:", fg="#20664A", bg="#DFEFF0") 
         Salidainfo.config(font=("Segoe UI Black",15))
-        Salidainfo.place(x=50, y=470)
+        Salidainfo.place(x=30, y=470)
     
-        self.Pantalla2 = tk.Label(self, foreground="white", background="black", width=30, height=2, textvariable= self.MCraiz) 
+        self.Pantalla2 = tk.Label(self, textvariable= self.MCraiz) 
+        self.Pantalla2.config(foreground="white", background="black", width=35, height=3)
         self.Pantalla2.place(x=70, y=520)
 
     def calcular(self):
@@ -323,13 +327,13 @@ class Page2(tk.Frame):
                 
                 fxx  = fx.subs(x,xi)
                 dfx = derivada.subs(x,xi)
-                xnuevo = float(xi) - float(fxx / dfx)
+                xnuevo = float((xi) - (fxx / dfx))
 
                 tramo  = abs(xnuevo - xi)
                 xi = xnuevo
 
-                np.set_printoptions(precision = 4)
-                return (self.MCraiz.set(tramo) , self.MCderivada.set(derivada))
+            np.set_printoptions(precision = 4)
+            return (self.MCraiz.set(xi) , self.MCderivada.set(derivada))
         
         except ValueError:
                 MessageBox.showerror("Error", "Ingrese un valor valido")

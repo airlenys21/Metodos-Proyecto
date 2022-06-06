@@ -11,6 +11,7 @@ import math as mt
 x = Symbol('x')
 fx=parse_expr(input("Ingrese el fx: "))
 xi= parse_expr(input("Mete la Intersección: "))
+xi= float(input("Mete la Intersección: "))
 
 
 #Resolver derivada
