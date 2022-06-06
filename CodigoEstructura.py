@@ -1,170 +1,370 @@
-import tkinter as tk
 from tkinter import *
-from tkinter import messagebox as MessageBox    
-from matplotlib.figure import Figure 
-from matplotlib.backends.backend_tkagg import (FigureCanvasTkAgg,  
-NavigationToolbar2Tk)
+import tkinter as tk
+from sympy import *
+from math import *
+import sympy as sp
+import numpy as np
+import matplotlib as plt
+from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
+from matplotlib.figure import Figure
+from tkinter import messagebox as MessageBox  
+from setuptools import Command 
 
-
-########################################################################
-
-
-class VentanaBinario(tk.Toplevel):
    
-    #----------------------------------------------------------------------
-    def __init__(self, Ventbianrio):
-        self.Ventbinario = Ventbianrio
-        tk.Toplevel.__init__(self)
-        self.title("Sistema Binario")
-        self.geometry("850x600")
-        self.config(bg="#DFEFF0")
-        self.decimal=tk.StringVar()
-        self.NumConv=tk.StringVar()
-        
+class tkinterApp(tk.Tk): 
 
-        #Titulos
-        Titulo=Label (self, text="Métodos de búsqueda de raíces", fg="#002060", bg="#DFEFF0" )
-        Titulo.config(font=("Cooper Black",35 ))
-        Titulo.place(x=65, y=20)
-
-        Titulo2=Label (self, text="Método cerrado y método cerrado ", fg="#20664A", bg="#DFEFF0" )
-        Titulo2.config(font=("Segoe UI Black",30 ))
-        Titulo2.place(x=100, y=75)
-
-        Subtitulo=tk.Label (self, text="Bisección - Secante", fg="#20664A", bg="#DFEFF0") 
-        Subtitulo.config(font=("Segoe UI Black",21))
-        Subtitulo.place(x=280, y=130)
-
-        #Entrada
-        info=tk.Label (self, text="Ingresa el número decimal", fg="#20664A", bg="#DEF0FC") 
-        info.config(font=("Segoe UI Black",15))
-        info.place(x=60, y=220)
- 
-        self.EntradaDec=Entry(self, textvariable= self.decimal)
-        self.EntradaDec.place(x=130, y=270)
-
-        #Gráfica
-        Gráfica=tk.Frame(self)
-        Gráfica.place(x=370, y=190)
-        Gráfica.config( width="425", height="350", borderwidth = 5, relief="groove")
-
-        #Botón
-        Convertir=tk.Button(self, text="Convertir", width=15 , command=self.decimal_a_binario)
-        Convertir.place(x=130, y=310)
-
-        regresar=tk.Button(self, text="Regresar", width=15,  command=self.onClose)
-        regresar.place(x=425, y=565)
-
-        Otro=tk.Button(self, text="Resetear", width=15 , command=self.reset)
-        Otro.place(x=625, y=565)
-
-        #Salida
-        Salidader=tk.Label (self, text="La derivada es:", fg="#20664A", bg="#DEF0FC") 
-        Salidader.config(font=("Segoe UI Black",15))
-        Salidader.place(x=30, y=380)
-
-        self.Pantalla1 = tk.Label(self, foreground="black", width=18, height=1, borderwidth = 1, relief="raised", textvariable= self.NumConv) 
-        self.Pantalla1.place(x=200, y=390)
-
-        Salidainfo=tk.Label (self, text="La raíz de la función es:", fg="#20664A", bg="#DEF0FC") 
-        Salidainfo.config(font=("Segoe UI Black",15))
-        Salidainfo.place(x=50, y=450)
-    
-        self.Pantalla2 = tk.Label(self, foreground="white", background="black", width=30, height=2, textvariable= self.NumConv) 
-        self.Pantalla2.place(x=70, y=500)
-        
-    #----------------------------------------------------------------------
-    def decimal_a_binario(self):
-        try:
-            decBinario = int(self.decimal.get())
-            binario = ""
-
-            if decBinario < 0:
-                MessageBox.showerror("Error", "El numero debe ser entero positivo ")
-
-            elif decBinario > 4096:
-                MessageBox.showerror("Error", "El numero sobrepasa la cantidad que puede representar el sistema")
-            
-            else:
-                while decBinario > 0:
-                    residuo = decBinario % 2
-                    binario = str(residuo) + binario
-                    decBinario = int(decBinario/ 2)
-                return self.NumConv.set(binario)
-    
-        except ValueError:
-                MessageBox.showerror("Error", "Debe ingresar un numero entero")
-
-    #----------------------------------------------------------------------
-    def onClose(self):
-        self.destroy()
-        self.Ventbinario.show()
-
-    def reset(self):
-        self.EntradaDec.delete(0, "end")
-        self.NumConv.set(0)
+    def __init__(self, *args, **kwargs):  
        
+        tk.Tk.__init__(self, *args, **kwargs) 
+ 
+        container = tk.Frame(self)   
+        container.pack(side = "top", fill = "both", expand = True)  
+   
+        container.grid_rowconfigure(0, weight = 1) 
+        container.grid_columnconfigure(0, weight = 1) 
+   
+        self.frames = {}   
+   
+        for F in (StartPage, Page1, Page2): 
+            frame = F(container, self) 
+            self.frames[F] = frame  
+            frame.grid(row = 0, column = 0, sticky ="nsew") 
+   
+        self.show_frame(StartPage) 
+   
+    def show_frame(self, cont): 
+        frame = self.frames[cont] 
+        frame.tkraise() 
+   
+class StartPage(tk.Frame): 
+    def __init__(self, parent, controller):  
+        tk.Frame.__init__(self, parent) 
+        self.config(bg="#DFEFF0")
 
+        Titulo=tk.Label (self, text="Métodos para encontrar raíces", fg="#002060", bg="#DFEFF0" )
+        Titulo.config(font=("Cooper Black",40 ))
+        Titulo.place(x=15, y=60)
 
-########################################################################
-class principal(object):
+        Titulo2=tk.Label (self, text="Métodos Cerrado y Abierto", fg="#20664A", bg="#DFEFF0" )
+        Titulo2.config(font=("Segoe UI Black",33 ))
+        Titulo2.place(x=130, y=120)
 
-    #----------------------------------------------------------------------
-    def __init__(self, Ventana):
-        self.vent = Ventana
-        self.vent.title("Búsqueda de raíces")
-        self.vent.config(bg="#DFEFF0")
-
-        Titulo=Label (self.vent, text="Métodos de búsqueda de raíces", fg="#002060", bg="#DFEFF0" )
-        Titulo.config(font=("Cooper Black",35 ))
-        Titulo.place(x=65, y=40)
-
-        Titulo2=tk.Label (self.vent, text="Método cerrado y método cerrado ", fg="#20664A", bg="#DFEFF0" )
-        Titulo2.config(font=("Segoe UI Black",30 ))
-        Titulo2.place(x=100, y=100)
-
-        Subtitulo=tk.Label (self.vent, text="Bisección - Secante", fg="#20664A", bg="#DFEFF0") 
-        Subtitulo.config(font=("Segoe UI Black",21))
-        Subtitulo.place(x=280, y=160)
+        Subtitulo=tk.Label (self, text="Bisección - Raphson", fg="#20664A", bg="#DFEFF0") 
+        Subtitulo.config(font=("Segoe UI Black",28))
+        Subtitulo.place(x=250, y=180)
 
         ##Info
-        Info=tk.Label (self.vent, text="Selecciona con que método deseas buscar la raíz", fg="#002060", bg="#DFEFF0") 
-        Info.config(font=("Segoe UI Black",15))
-        Info.place(x=190, y=250)
+        Info=tk.Label (self, text="Selecciona con que método deseas buscar la raíz", fg="#002060", bg="#DFEFF0") 
+        Info.config(font=("Segoe UI Black",20))
+        Info.place(x=100, y=260)
 
-        Info=tk.Label (self.vent, text="Creadores", fg="#7D9C9F", bg="#DFEFF0") 
-        Info.config(font=("Segoe UI Black",10))
-        Info.place(x=360, y=515)
+        Info=tk.Label (self, text="Creadores", fg="#7D9C9F", bg="#DFEFF0") 
+        Info.config(font=("Segoe UI Black",12))
+        Info.place(x=340, y=565)
 
-        Info=tk.Label (self.vent, text="Airlenys Recuero , Gabriela Vásquez", fg="#7D9C9F", bg="#DFEFF0") 
-        Info.config(font=("Segoe UI Black",10))
-        Info.place(x=280, y=540)
+        Info=tk.Label (self, text="Airlenys Recuero , Gabriela Vásquez", fg="#7D9C9F", bg="#DFEFF0") 
+        Info.config(font=("Segoe UI Black",12))
+        Info.place(x=240, y=600)
         
-        ##Botones
-        Binario=tk.Button(self.vent, text="Método cerrado", width=15, command=self.openBinario)
-        Binario.place(x=220, y=340)
+        ##Botones 
+        MCerrado=tk.Button(self, text="Método Cerrado", foreground="#002060" , background="#D5F4FF", width=40, height=8 ,command = lambda : controller.show_frame(Page1)) 
+        MCerrado.place(x=100, y=360)
         
-        Binario=tk.Button(self.vent, text="Método abierto ", width=15)#, command=self.openBinario)
-        Binario.place(x=500, y=340)
+        MAbierto=tk.Button(self, text="Método Abierto ", foreground="#002060" , background="#D5F4FF", width=40 , height=8 , command = lambda : controller.show_frame(Page2))
+        MAbierto.place(x=500, y=360)
 
-        Cerrar=tk.Button(self.vent, text="Cerrar", width=10, command=self.cerrar)
-        Cerrar.place(x=750, y=540)
+        Cerrar=tk.Button(self, text="Cerrar", width=10, command= self.cerrar)
+        Cerrar.place(x=750, y=590) 
+    
+    def cerrar(self):
+        self.quit()  
+  
+class Page1(tk.Frame): 
+      
+    def __init__(self, parent, controller): 
+          
+        self.vent = tk.Frame.__init__(self, parent)
+        self.config(bg="#DFEFF0")
+        self.function=tk.StringVar()
+        self.ValorA=tk.StringVar()
+        self.ValorB=tk.StringVar()
+        self.MAraiz=tk.StringVar()
+
+        #Titulos
+        Titulo=tk.Label (self, text="Métodos de búsqueda de raíces", fg="#002060", bg="#DFEFF0" )
+        Titulo.config(font=("Cooper Black",30 ))
+        Titulo.place(x=130, y=10)
+
+        Titulo2=tk.Label (self, text="Método Cerrado", fg="#20664A", bg="#DFEFF0" )
+        Titulo2.config(font=("Segoe UI Black", 20 ))
+        Titulo2.place(x=290, y=60)
+
+        Subtitulo=tk.Label (self, text="Bisección", fg="#20664A", bg="#DFEFF0") 
+        Subtitulo.config(font=("Segoe UI Black",18))
+        Subtitulo.place(x=350, y=100)
+
+        #Entrada
+        info=tk.Label (self, text="Ingresar la Función:", fg="#20664A", bg="#DFEFF0") 
+        info.config(font=("Segoe UI Black",15))
+        info.place(x=60, y=180)
+ 
+        self.Entradafunc=Entry(self, textvariable= self.function)
+        self.Entradafunc.config(insertbackground="#002060" , justify=CENTER, font=("Times",15))
+        self.Entradafunc.place(x=90, y=225 , width=210, height=30)
+
+        
+        info=tk.Label (self, text="Valores iniciales:", fg="#20664A", bg="#DFEFF0") 
+        info.config(font=("Segoe UI Black",15))
+        info.place(x=90, y=280)
+
+        info=tk.Label (self, text="a=", fg="#20664A", bg="#DFEFF0") 
+        info.config(font=("Segoe UI Black",15))
+        info.place(x=80, y=320)
+
+        self.EntradaXA=Entry(self, textvariable= self.ValorA)
+        self.EntradaXA.config(insertbackground="#002060" , justify=CENTER, font=("Times",12))
+        self.EntradaXA.place(x=115, y=325 , width=40, height=30)
+
+        info2=tk.Label (self, text="b=", fg="#20664A", bg="#DFEFF0") 
+        info2.config(font=("Segoe UI Black",15))
+        info2.place(x=200, y=320)
+        
+        self.EntradaXB=Entry(self, textvariable= self.ValorB)
+        self.EntradaXB.config(insertbackground="#002060" , justify=CENTER, font=("Times",15))
+        self.EntradaXB.place(x=235, y=325 , width=40, height=30)
+        
+        #Gráfica
+        self.Gráfica=tk.LabelFrame(self)
+        self.Gráfica.place(x=370, y=190)
+        self.Gráfica.config( width=435, height=370, borderwidth = 5, relief="groove")
+
+
+        #Botón
+        Convertir=tk.Button(self, text="Convertir", width=15, command=self.MAbierto) 
+        Convertir.place(x=130, y=375)
+
+        Resetear=tk.Button(self, text="Resetear", width=15 , command=self.reset)
+        Resetear.place(x=425, y=595)
+        
+        regresar=tk.Button(self, text="Regresar", width=15, command = lambda : [controller.show_frame(StartPage), self.reset()])
+        regresar.place(x=625, y=595)
+
+        #Salida
+        Salidainfo=tk.Label (self, text="La raíz de la función es:", fg="#20664A", bg="#DFEFF0") 
+        Salidainfo.config(font=("Segoe UI Black",15))
+        Salidainfo.place(x=55, y=450)
+    
+        self.Pantalla2 = tk.Label(self, textvariable= self.MAraiz) 
+        self.Pantalla2.config(foreground="white", background="black", width=35, height=3)
+        self.Pantalla2.place(x=60, y=495)
+    
+    def calcular(self):
+
+        x = Symbol('x')
+        ecu= parse_expr(self.function.get())
+        fx=sp.lambdify(x,ecu)
+ 
+
+        self.x = range( -3, 9, 1)
+        self.figura = Figure(figsize=(6, 5), dpi=70)
+        self.figura.add_subplot(111).plot(self.x, [fx(i) for i in self.x], '-o')
+
+        canvas = FigureCanvasTkAgg(self.figura, master=self.Gráfica)
+        canvas.draw()
+        canvas.get_tk_widget().place(x=0, y=0)
+    
+
+    def MAbierto(self):
+        
+        try:
+            self.calcular()
+            x = Symbol('x')
+            fx= parse_expr(self.function.get()) 
+            a= parse_expr(self.ValorA.get())
+            b= parse_expr(self.ValorB.get())
+
+            if fx  <= 1:
+                MessageBox.showerror("Error", "Debe ingresar una función")
+
+            elif not float(a):
+                MessageBox.showerror("Error", "El numero debe ser entero positivo ")
+            
+            elif not float(b):
+                MessageBox.showerror("Error", "El numero debe ser entero positivo ")
+            
+            else:
+
+                tolera = 0.001
+                fx= sp.lambdify(x,fx)
+                # PROCEDIMIENTO
+                tramo = abs(b-a)
+                while not(tramo<=tolera):
+                    fa = fx(a)
+                    fb = fx(b)
+                    c = float(b - fb*(a-b)/(fa-fb))
+                    fc = fx(c)
+                    cambia = np.sign(fa)*np.sign(fc)
+                    if (cambia > 0):
+                        tramo = abs(c-a)
+                        a = c
+                    else:
+                        tramo = abs(b-c)
+                        b = c
+                raiz = c
+                return self.MAraiz.set(raiz)
+
+        except ValueError:
+                MessageBox.showerror("Error", "Ingrese valore validas")
+
+
+
     #----------------------------------------------------------------------
 
-    def cerrar(self):
-        self.vent.destroy()
+    def reset(self):
+        self.Entradafunc.delete(0 , "end")
+        self.EntradaXA.delete(0 , "end")
+        self.EntradaXB.delete(0 , "end")
+        self.MAraiz.set(' ')
+        for item in self.canvas.get_tk_widget().find_all(): self.canvas.get_tk_widget().delete(item)
+        
+class Page2(tk.Frame):  
+    def __init__(self, parent, controller): 
+        tk.Frame.__init__(self, parent)
+        self.config(bg="#DFEFF0")
+        self.function=tk.StringVar()
+        self.interseccion=tk.StringVar()
+        self.MCderivada=tk.StringVar()
+        self.MCraiz=tk.StringVar()
 
-    def openBinario(self):
-        self.vent.withdraw()
-        VentanaBinario(self)
+        #Titulos
+        Titulo=tk.Label (self, text="Métodos de búsqueda de raíces", fg="#002060", bg="#DFEFF0" )
+        Titulo.config(font=("Cooper Black",30 ))
+        Titulo.place(x=130, y=10)
 
-    def show(self):
-        self.vent.update()
-        self.vent.deiconify()
+        Titulo2=tk.Label (self, text="Método Abierto", fg="#20664A", bg="#DFEFF0" )
+        Titulo2.config(font=("Segoe UI Black", 20 ))
+        Titulo2.place(x=290, y=60)
+
+        Subtitulo=tk.Label (self, text="Raphson", fg="#20664A", bg="#DFEFF0") 
+        Subtitulo.config(font=("Segoe UI Black",18))
+        Subtitulo.place(x=350, y=100)
+
+        #Entrada
+        info=tk.Label (self, text="Ingresa la función:", fg="#20664A", bg="#DFEFF0") 
+        info.config(font=("Segoe UI Black",15))
+        info.place(x=60, y=180)
+ 
+        self.Entradafunc=Entry(self, textvariable= self.function)
+        self.Entradafunc.config(insertbackground="#002060" , justify=CENTER, font=("Times",15))
+        self.Entradafunc.place(x=90, y=225 , width=210, height=30, )
+        
+        info=tk.Label (self, text="Intersección: ", fg="#20664A", bg="#DFEFF0") 
+        info.config(font=("Segoe UI Black",15))
+        info.place(x=60, y=280)
+        
+        self.EntradaDeri=Entry(self, textvariable= self.interseccion)
+        self.EntradaDeri.config(insertbackground="#002060" , justify=CENTER, font=("Times",15))
+        self.EntradaDeri.place(x=200, y=285 , width=105, height=30, )
+        
+        #Gráfica
+        self.Gráfica=tk.LabelFrame(self)
+        self.Gráfica.place(x=370, y=190)
+        self.Gráfica.config( width="435", height="370", borderwidth = 5, relief="groove")
+        
+
+        #Botón
+        Convertir=tk.Button(self, text="Convertir", width=15, command=self.MCerrado)
+        Convertir.place(x=130, y=340)
+
+        Resetear=tk.Button(self, text="Resetear", width=10 , command=self.reset)
+        Resetear.place(x=425, y=595)
+        
+        regresar=tk.Button(self, text="Regresar", width=15, command = lambda : [controller.show_frame(StartPage), self.reset()])
+        regresar.place(x=625, y=595)
+
+        #Salida
+        Salidader=tk.Label (self, text="La derivada es:", fg="#20664A", bg="#DFEFF0") 
+        Salidader.config(font=("Segoe UI Black",15))
+        Salidader.place(x=30, y=410)
+
+        self.Pantalla1 = tk.Label(self, foreground="black", width=18, height=1, borderwidth = 1, relief="raised", textvariable= self.MCderivada) 
+        self.Pantalla1.place(x=200, y=420)
+
+        Salidainfo=tk.Label (self, text="La raíz de la función es:", fg="#20664A", bg="#DFEFF0") 
+        Salidainfo.config(font=("Segoe UI Black",15))
+        Salidainfo.place(x=50, y=470)
     
-#----------------------------------------------------------------------
-if __name__ == "__main__":
-    Ventana = tk.Tk()
-    Ventana.geometry("850x600")
-    app = principal(Ventana)
-    Ventana.mainloop()
+        self.Pantalla2 = tk.Label(self, foreground="white", background="black", width=30, height=2, textvariable= self.MCraiz) 
+        self.Pantalla2.place(x=70, y=520)
+
+    def calcular(self):
+        # x**3-2*x-5 
+        x = Symbol('x')
+
+        ecu= parse_expr(self.function.get())
+        fx=sp.lambdify(x,ecu)
+
+        self.x = range( -4, 5, 1)
+        self.figura = Figure(figsize=(6, 5), dpi=70)
+        self.figura.add_subplot(111).plot(self.x, [fx(i) for i in self.x], '-o')
+    
+        self.canvas = FigureCanvasTkAgg(self.figura, master=self.Gráfica)
+        self.canvas.draw()
+        self.canvas.get_tk_widget().place(x=0, y=0)
+
+    def MCerrado(self):
+        try:
+            self.calcular()
+            x = Symbol('x')
+            fx= parse_expr(self.function.get())
+            xi= float(self.interseccion.get())
+         
+        except ValueError:
+                MessageBox.showerror("Error", "Debes ingresar un valor ") 
+        
+
+          
+        y = fx
+        derivada = sp.diff(y,x) 
+
+        tolera = 0.001
+        tramo = abs(2*tolera)
+        while (tramo >= tolera):
+            
+            fxx  = fx.subs(x,xi)
+            dfx = derivada.subs(x,xi)
+            xnuevo = float(xi) - float(fxx / dfx)
+
+            tramo  = abs(xnuevo - xi)
+            xi = xnuevo
+
+            np.set_printoptions(precision = 4)
+            return (self.MCraiz.set(tramo) , self.MCderivada.set(derivada))
+
+        
+
+    #----------------------------------------------------------------------
+
+    def reset(self):
+        self.Entradafunc.delete(0 , "end")
+        self.EntradaDeri.delete(0 , "end")
+        self.MCderivada.set(' ')
+        self.MCraiz.set(' ')
+        for item in self.canvas.get_tk_widget().find_all(): self.canvas.get_tk_widget().delete(item)
+        
+  
+app = tkinterApp() 
+##app.iconbitmap('C:/Users/riuni/OneDrive/Escritorio/Python/metodo_numerico/Proyecto2_Prueba/Aizawa_Icon.ico')
+ancho_ventana = 850
+alto_ventana = 750
+
+x_ventana = app.winfo_screenwidth() // 2 - ancho_ventana // 2
+y_ventana = app.winfo_screenheight() // 2 - alto_ventana // 2
+
+posicion = str(ancho_ventana) + "x" + str(alto_ventana) + "+" + str(x_ventana) + "+" + str(y_ventana)
+app.geometry(posicion)
+
+app.resizable(0,0)
+app.geometry("850x650")
+app.title("Búsqueda de raíces")
+app.mainloop() 
