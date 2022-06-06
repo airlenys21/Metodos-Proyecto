@@ -5,7 +5,7 @@ from math import *
 import sympy as sp
 import numpy as np
 import matplotlib.pyplot as plt
-
+import math as mt
 
 #Ingreso de la función
 x = Symbol('x')
