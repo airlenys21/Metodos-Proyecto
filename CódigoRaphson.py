@@ -10,7 +10,6 @@ import math as mt
 #Ingreso de la función
 x = Symbol('x')
 fx=parse_expr(input("Ingrese el fx: "))
-xi= parse_expr(input("Mete la Intersección: "))
 xi= float(input("Mete la Intersección: "))
 
 
