@@ -146,7 +146,7 @@ class Page1(tk.Frame):
         Resetear=tk.Button(self, text="Resetear", width=15 , command=self.reset)
         Resetear.place(x=425, y=595)
         
-        regresar=tk.Button(self, text="Regresar", width=15, command = lambda : [controller.show_frame(StartPage), self.reset()])
+        regresar=tk.Button(self, text="Regresar", width=15, command = lambda : controller.show_frame(StartPage))
         regresar.place(x=625, y=595)
 
         #Salida
@@ -183,35 +183,25 @@ class Page1(tk.Frame):
             a= parse_expr(self.ValorA.get())
             b= parse_expr(self.ValorB.get())
 
-            if fx  <= 1:
-                MessageBox.showerror("Error", "Debe ingresar una función")
 
-            elif not float(a):
-                MessageBox.showerror("Error", "El numero debe ser entero positivo ")
-            
-            elif not float(b):
-                MessageBox.showerror("Error", "El numero debe ser entero positivo ")
-            
-            else:
-
-                tolera = 0.001
-                fx= sp.lambdify(x,fx)
-                # PROCEDIMIENTO
-                tramo = abs(b-a)
-                while not(tramo<=tolera):
-                    fa = fx(a)
-                    fb = fx(b)
-                    c = float(b - fb*(a-b)/(fa-fb))
-                    fc = fx(c)
-                    cambia = np.sign(fa)*np.sign(fc)
-                    if (cambia > 0):
-                        tramo = abs(c-a)
-                        a = c
-                    else:
-                        tramo = abs(b-c)
-                        b = c
-                raiz = c
-                return self.MAraiz.set(raiz)
+            tolera = 0.001
+            fx= sp.lambdify(x,fx)
+            # PROCEDIMIENTO
+            tramo = abs(b-a)
+            while not(tramo<=tolera):
+                fa = fx(a)
+                fb = fx(b)
+                c = float(b - fb*(a-b)/(fa-fb))
+                fc = fx(c)
+                cambia = np.sign(fa)*np.sign(fc)
+                if (cambia > 0):
+                    tramo = abs(c-a)
+                    a = c
+                else:
+                    tramo = abs(b-c)
+                    b = c
+            raiz = c
+            return self.MAraiz.set(raiz)
 
         except ValueError:
                 MessageBox.showerror("Error", "Ingrese valore validas")
@@ -279,7 +269,7 @@ class Page2(tk.Frame):
         Resetear=tk.Button(self, text="Resetear", width=10 , command=self.reset)
         Resetear.place(x=425, y=595)
         
-        regresar=tk.Button(self, text="Regresar", width=15, command = lambda : [controller.show_frame(StartPage), self.reset()])
+        regresar=tk.Button(self, text="Regresar", width=15, command = lambda : controller.show_frame(StartPage))
         regresar.place(x=625, y=595)
 
         #Salida
@@ -318,28 +308,24 @@ class Page2(tk.Frame):
             x = Symbol('x')
             fx= parse_expr(self.function.get())
             xi= float(self.interseccion.get())
-         
+            y = fx
+            derivada = sp.diff(y,x) 
+
+            tolera = 0.001
+            tramo = abs(2*tolera)
+            while (tramo >= tolera):
+                
+                fxx  = fx.subs(x,xi)
+                dfx = derivada.subs(x,xi)
+                xnuevo = float(xi) - float(fxx / dfx)
+
+                tramo  = abs(xnuevo - xi)
+                xi = xnuevo
+
+                np.set_printoptions(precision = 4)
+                return (self.MCraiz.set(tramo) , self.MCderivada.set(derivada))
         except ValueError:
                 MessageBox.showerror("Error", "Debes ingresar un valor ") 
-        
-
-          
-        y = fx
-        derivada = sp.diff(y,x) 
-
-        tolera = 0.001
-        tramo = abs(2*tolera)
-        while (tramo >= tolera):
-            
-            fxx  = fx.subs(x,xi)
-            dfx = derivada.subs(x,xi)
-            xnuevo = float(xi) - float(fxx / dfx)
-
-            tramo  = abs(xnuevo - xi)
-            xi = xnuevo
-
-            np.set_printoptions(precision = 4)
-            return (self.MCraiz.set(tramo) , self.MCderivada.set(derivada))
 
         
 
