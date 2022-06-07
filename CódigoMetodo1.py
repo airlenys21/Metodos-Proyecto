@@ -3,9 +3,9 @@ from sympy import *
 from math import *
 import sympy as sp
 import numpy as np
-# Algoritmo Posicion Falsa para raices
-# busca en intervalo [a,b]
-# INGRESO  -0.5*(x**2) + 2.5*x + 4.5  5  10
+
+
+# INGRESO  -0.5*(x**2) + 2.5*x + 4.5  A= 5  B= 10
 
 x = Symbol('x')
 fx = parse_expr(input("ingresa la ecuación: "))
